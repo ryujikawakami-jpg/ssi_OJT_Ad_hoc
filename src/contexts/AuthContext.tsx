@@ -25,15 +25,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchProfile = async (userId: string, email?: string) => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+      if (data) {
+        setUser(data as UserProfile);
+      } else if (error) {
+        // Profile doesn't exist yet — create a minimal one so the app works
+        console.warn("Profile not found, using fallback:", error.message);
+        setUser({
+          id: userId,
+          email: email || "",
+          role: "user",
+          name_jp: "",
+          name_kana: "",
+          phone: "",
+          birth_date: "",
+          postal_code: "",
+          address: "",
+          created_at: new Date().toISOString(),
+        });
+      }
+    };
+
     const restore = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-        if (data) setUser(data as UserProfile);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          await fetchProfile(session.user.id, session.user.email);
+        }
+      } catch (e) {
+        console.error("Auth restore error:", e);
       }
       setLoading(false);
     };
@@ -41,15 +66,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-        if (data) setUser(data as UserProfile);
+        await fetchProfile(session.user.id, session.user.email);
       } else {
         setUser(null);
       }
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
