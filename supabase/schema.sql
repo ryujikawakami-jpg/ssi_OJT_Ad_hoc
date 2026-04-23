@@ -104,7 +104,7 @@ begin
   new.updated_at = now();
   return new;
 end;
-$$ language plpgsql;
+$$ language plpgsql set search_path = public;
 
 drop trigger if exists trg_profiles_updated_at on profiles;
 create trigger trg_profiles_updated_at
@@ -133,7 +133,7 @@ begin
   );
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Drop first so we can re-run this file safely
 drop trigger if exists on_auth_user_created on auth.users;
@@ -283,4 +283,4 @@ returns void as $$
 begin
   update products set stock = greatest(stock - qty, 0) where id = p_id;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
