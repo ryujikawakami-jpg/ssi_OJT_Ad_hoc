@@ -1,26 +1,208 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --sd-forest:  #1f3d2b;
+  --sd-moss:    #3a5a44;
+  --sd-sage:    #7a8b6d;
+  --sd-lichen:  #b8bfa6;
+
+  --sd-cream:     #f4efe6;
+  --sd-cream-2:   #ece6d8;
+  --sd-paper:     #fbf8f1;
+  --sd-bone:      #e6dfcd;
+
+  --sd-ink:       #1a1f18;
+  --sd-ink-2:     #3d423a;
+  --sd-ink-3:     #6c7065;
+  --sd-ink-4:     #9a9d93;
+
+  --sd-wine:      #6b2b2b;
+  --sd-ochre:     #a67c2e;
+  --sd-stone:     #d5cfc0;
+
+  --sd-line: 1px solid var(--sd-bone);
+  --sd-line-strong: 1px solid color-mix(in oklab, var(--sd-ink) 18%, transparent);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-sd-forest: #1f3d2b;
+  --color-sd-moss: #3a5a44;
+  --color-sd-sage: #7a8b6d;
+  --color-sd-lichen: #b8bfa6;
+  --color-sd-cream: #f4efe6;
+  --color-sd-cream-2: #ece6d8;
+  --color-sd-paper: #fbf8f1;
+  --color-sd-bone: #e6dfcd;
+  --color-sd-ink: #1a1f18;
+  --color-sd-ink-2: #3d423a;
+  --color-sd-ink-3: #6c7065;
+  --color-sd-ink-4: #9a9d93;
+  --color-sd-wine: #6b2b2b;
+  --color-sd-ochre: #a67c2e;
+  --color-sd-stone: #d5cfc0;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif-jp: "Noto Serif JP", "Yu Mincho", serif;
+  --font-sans-jp: "Noto Sans JP", "Hiragino Sans", sans-serif;
+  --font-serif-en: "EB Garamond", "Noto Serif JP", Georgia, serif;
+  --font-sans-en: "Inter", "Noto Sans JP", -apple-system, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans-jp);
+  color: var(--sd-ink);
+  background: var(--sd-cream);
+  font-feature-settings: "palt" 1;
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.01em;
+}
+
+* { box-sizing: border-box; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif-jp);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  margin: 0;
+  line-height: 1.25;
+}
+
+p { margin: 0; line-height: 1.7; }
+
+.en {
+  font-family: var(--font-serif-en);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 400;
+  font-style: italic;
+  font-size: 10px;
+  color: var(--sd-ink-3);
+}
+
+.en-caps {
+  font-family: var(--font-sans-en);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 10px;
+  color: var(--sd-ink-3);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-feature-settings: "tnum" 1;
+  letter-spacing: 0;
+}
+
+/* Placeholder stripes */
+.sd-placeholder {
+  position: relative;
+  background:
+    repeating-linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--sd-moss) 8%, transparent) 0 1px,
+      transparent 1px 9px
+    ),
+    var(--sd-cream-2);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  padding: 14px;
+  color: var(--sd-ink-2);
+  border: var(--sd-line);
+}
+.sd-placeholder .tag {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--sd-ink-3);
+}
+.sd-placeholder.tonal-a { background-color: #dcd5c2; }
+.sd-placeholder.tonal-b { background-color: #c8c9b6; }
+.sd-placeholder.tonal-c { background-color: #b9c0ad; }
+.sd-placeholder.tonal-d { background-color: #a6a890; }
+.sd-placeholder.tonal-e { background-color: #cec3a8; }
+.sd-placeholder.tonal-f { background-color: #d9cdb3; }
+.sd-placeholder.tonal-g { background-color: #b5b098; }
+.sd-placeholder.tonal-h { background-color: #ccc2a5; }
+
+/* Buttons */
+.sd-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 22px;
+  font-family: var(--font-sans-jp);
+  font-weight: 500;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  border: 1px solid transparent;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background .2s, border-color .2s, color .2s;
+}
+.sd-btn--primary { background: var(--sd-forest); color: var(--sd-paper); }
+.sd-btn--primary:hover { background: var(--sd-moss); }
+.sd-btn--ghost { background: transparent; color: var(--sd-forest); border-color: var(--sd-forest); }
+.sd-btn--ghost:hover { background: var(--sd-forest); color: var(--sd-paper); }
+.sd-btn--quiet { background: transparent; color: var(--sd-ink-2); padding: 10px 14px; }
+.sd-btn--quiet:hover { background: color-mix(in oklab, var(--sd-ink) 6%, transparent); }
+.sd-btn .arr { font-family: var(--font-serif-en); font-style: normal; }
+
+/* Inputs */
+.sd-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--sd-ink-4);
+  padding: 10px 2px;
+  font-family: var(--font-sans-jp);
+  font-size: 14px;
+  color: var(--sd-ink);
+  outline: none;
+  transition: border-color .2s;
+}
+.sd-input:focus { border-bottom-color: var(--sd-forest); }
+.sd-input::placeholder { color: var(--sd-ink-4); }
+
+.sd-field-label {
+  font-family: var(--font-sans-en);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--sd-ink-3);
+  margin-bottom: 4px;
+  display: block;
+}
+
+.sd-hr { border: 0; border-top: var(--sd-line); margin: 0; }
+
+.sd-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-sans-en);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sd-ink-3);
+  padding: 4px 10px;
+  border: 1px solid var(--sd-bone);
+  border-radius: 999px;
+  background: transparent;
+}
+.sd-tag--solid { background: var(--sd-forest); color: var(--sd-paper); border-color: var(--sd-forest); }
+.sd-tag--sage  { background: transparent; color: var(--sd-moss); border-color: var(--sd-sage); }
+.sd-tag--wine  { color: var(--sd-wine); border-color: color-mix(in oklab, var(--sd-wine) 40%, transparent); }
+
+/* Skeleton loading */
+.sd-skel {
+  background: linear-gradient(90deg, var(--sd-cream-2) 0%, var(--sd-bone) 50%, var(--sd-cream-2) 100%);
+  background-size: 200% 100%;
+  animation: sd-pulse 1.6s ease-in-out infinite;
+}
+@keyframes sd-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
