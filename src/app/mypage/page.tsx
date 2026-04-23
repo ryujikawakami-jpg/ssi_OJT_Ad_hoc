@@ -70,11 +70,11 @@ export default function MyPagePage() {
     }
   };
 
-  const tabs: { id: Tab; jp: string; en: string }[] = [
+  const tabs: { id: Tab; jp: string; en: string; disabled?: boolean }[] = [
     { id: "profile", jp: "プロフィール", en: "Profile" },
     { id: "orders", jp: "注文履歴", en: "Orders" },
-    { id: "favorites", jp: "お気に入り", en: "Favorites" },
-    { id: "addresses", jp: "配送先", en: "Addresses" },
+    { id: "favorites", jp: "お気に入り", en: "Favorites", disabled: true },
+    { id: "addresses", jp: "配送先", en: "Addresses", disabled: true },
     { id: "password", jp: "パスワード変更", en: "Password" },
     { id: "signout", jp: "ログアウト", en: "Sign Out" },
   ];
@@ -99,17 +99,23 @@ export default function MyPagePage() {
             <button
               key={t.id}
               onClick={() => {
+                if (t.disabled) return;
                 if (t.id === "signout") { signOut(); return; }
                 setTab(t.id);
               }}
-              className="block w-full text-left bg-transparent border-none cursor-pointer"
+              className="block w-full text-left bg-transparent border-none"
               style={{
                 padding: "11px 16px 11px 0",
                 borderBottom: "var(--sd-line)",
-                color: tab === t.id ? "var(--sd-forest)" : "var(--sd-ink-2)",
+                color: t.disabled ? "var(--sd-ink-4)" : tab === t.id ? "var(--sd-forest)" : "var(--sd-ink-2)",
+                cursor: t.disabled ? "not-allowed" : "pointer",
+                opacity: t.disabled ? 0.5 : 1,
               }}
             >
-              <div style={{ fontFamily: "var(--font-serif-jp)" }}>{tab === t.id && "· "}{t.jp}</div>
+              <div style={{ fontFamily: "var(--font-serif-jp)" }}>
+                {!t.disabled && tab === t.id && "· "}{t.jp}
+                {t.disabled && <span style={{ fontSize: 9, marginLeft: 6, color: "var(--sd-ink-4)" }}>未実装</span>}
+              </div>
               <div className="en-caps" style={{ fontSize: 8, marginTop: 2 }}>{t.en}</div>
             </button>
           ))}

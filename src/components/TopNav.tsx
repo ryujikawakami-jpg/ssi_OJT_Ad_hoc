@@ -16,10 +16,10 @@ export default function TopNav() {
   const displayCount = totalCount;
 
   const navItems = [
-    { id: "shop", jp: "ショップ", en: "Shop", href: "/products" },
-    { id: "journal", jp: "読みもの", en: "Journal", href: "#" },
-    { id: "about", jp: "わたしたちについて", en: "About", href: "#" },
-    { id: "stores", jp: "店舗", en: "Stores", href: "#" },
+    { id: "shop", jp: "ショップ", en: "Shop", href: "/products", disabled: false },
+    { id: "journal", jp: "読みもの", en: "Journal", href: "#", disabled: true },
+    { id: "about", jp: "わたしたちについて", en: "About", href: "#", disabled: true },
+    { id: "stores", jp: "店舗", en: "Stores", href: "#", disabled: true },
   ];
 
   const isActive = (href: string) => pathname.startsWith(href) && href !== "#";
@@ -32,20 +32,37 @@ export default function TopNav() {
       <Link href="/products"><Logo /></Link>
       <nav className="flex gap-9">
         {navItems.map((it) => (
-          <Link
-            key={it.id}
-            href={it.href}
-            className="no-underline text-center"
-            style={{
-              lineHeight: 1.1,
-              color: isActive(it.href) ? "var(--sd-forest)" : "var(--sd-ink-2)",
-              borderBottom: isActive(it.href) ? "1px solid var(--sd-forest)" : "1px solid transparent",
-              paddingBottom: 4,
-            }}
-          >
-            <div style={{ fontFamily: "var(--font-sans-jp)", fontSize: 13, fontWeight: 500 }}>{it.jp}</div>
-            <div className="en-caps" style={{ marginTop: 2, fontSize: 8 }}>{it.en}</div>
-          </Link>
+          it.disabled ? (
+            <span
+              key={it.id}
+              className="text-center"
+              style={{
+                lineHeight: 1.1,
+                color: "var(--sd-ink-4)",
+                opacity: 0.5,
+                cursor: "not-allowed",
+                paddingBottom: 4,
+              }}
+            >
+              <div style={{ fontFamily: "var(--font-sans-jp)", fontSize: 13, fontWeight: 500 }}>{it.jp}</div>
+              <div className="en-caps" style={{ marginTop: 2, fontSize: 8 }}>{it.en}</div>
+            </span>
+          ) : (
+            <Link
+              key={it.id}
+              href={it.href}
+              className="no-underline text-center"
+              style={{
+                lineHeight: 1.1,
+                color: isActive(it.href) ? "var(--sd-forest)" : "var(--sd-ink-2)",
+                borderBottom: isActive(it.href) ? "1px solid var(--sd-forest)" : "1px solid transparent",
+                paddingBottom: 4,
+              }}
+            >
+              <div style={{ fontFamily: "var(--font-sans-jp)", fontSize: 13, fontWeight: 500 }}>{it.jp}</div>
+              <div className="en-caps" style={{ marginTop: 2, fontSize: 8 }}>{it.en}</div>
+            </Link>
+          )
         ))}
       </nav>
       <div className="flex items-center gap-6 text-xs">

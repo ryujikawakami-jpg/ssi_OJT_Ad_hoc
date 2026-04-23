@@ -19,13 +19,11 @@ export default function ProductListingPage() {
 
   useEffect(() => {
     const load = async () => {
-      console.log("Fetching products...");
-      const { data, error, status } = await supabase
+      const { data, error } = await supabase
         .from("products")
         .select("*")
         .eq("status", "公開")
         .order("created_at", { ascending: false });
-      console.log("Products response:", { status, error, count: data?.length, first: data?.[0]?.name_jp });
       if (error) console.error("Products fetch error:", error);
       if (data) setProducts(data as Product[]);
     };

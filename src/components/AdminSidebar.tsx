@@ -6,12 +6,12 @@ import Logo from "./Logo";
 import { useAuth } from "@/contexts/AuthContext";
 
 const items = [
-  { id: "dashboard", jp: "ダッシュボード", en: "Dashboard", href: "/admin" },
-  { id: "products", jp: "商品管理", en: "Products", href: "/admin/products" },
-  { id: "orders", jp: "注文管理", en: "Orders", href: "/admin/orders" },
-  { id: "customers", jp: "顧客管理", en: "Customers", href: "#" },
-  { id: "reports", jp: "売上レポート", en: "Reports", href: "/admin/reports" },
-  { id: "settings", jp: "設定", en: "Settings", href: "#" },
+  { id: "dashboard", jp: "ダッシュボード", en: "Dashboard", href: "/admin", disabled: true },
+  { id: "products", jp: "商品管理", en: "Products", href: "/admin/products", disabled: false },
+  { id: "orders", jp: "注文管理", en: "Orders", href: "/admin/orders", disabled: false },
+  { id: "customers", jp: "顧客管理", en: "Customers", href: "#", disabled: true },
+  { id: "reports", jp: "売上レポート", en: "Reports", href: "/admin/reports", disabled: false },
+  { id: "settings", jp: "設定", en: "Settings", href: "#", disabled: true },
 ];
 
 export default function AdminSidebar() {
@@ -30,7 +30,27 @@ export default function AdminSidebar() {
       <div style={{ borderTop: "var(--sd-line)" }} />
       <nav className="grid gap-0.5" style={{ padding: "16px 12px" }}>
         {items.map((it) => {
-          const on = pathname === it.href || (it.href !== "/admin" && pathname.startsWith(it.href) && it.href !== "#");
+          const on = !it.disabled && (pathname === it.href || (it.href !== "/admin" && pathname.startsWith(it.href)));
+          if (it.disabled) {
+            return (
+              <span
+                key={it.id}
+                className="block"
+                style={{
+                  padding: "10px 14px",
+                  borderRadius: 2,
+                  opacity: 0.4,
+                  cursor: "not-allowed",
+                }}
+              >
+                <div style={{ fontSize: 13, fontFamily: "var(--font-sans-jp)", color: "var(--sd-ink-4)" }}>
+                  {it.jp}
+                  <span style={{ fontSize: 9, marginLeft: 6, color: "var(--sd-ink-4)" }}>未実装</span>
+                </div>
+                <div className="en-caps" style={{ fontSize: 8, marginTop: 2, color: "var(--sd-ink-4)" }}>{it.en}</div>
+              </span>
+            );
+          }
           return (
             <Link
               key={it.id}
