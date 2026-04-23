@@ -145,6 +145,15 @@ create trigger on_auth_user_created
 -- 9. Row Level Security
 -- =============================================================
 
+-- Helper: RLS-bypass function to check admin role (avoids infinite recursion)
+create or replace function public.is_admin()
+returns boolean as $$
+  select exists (
+    select 1 from public.profiles
+    where id = auth.uid() and role = 'admin'
+  );
+$$ language sql security definer stable set search_path = public;
+
 -- ---- profiles ------------------------------------------------
 alter table profiles enable row level security;
 
@@ -156,12 +165,7 @@ create policy "profiles_select_own"
 drop policy if exists "profiles_select_admin" on profiles;
 create policy "profiles_select_admin"
   on profiles for select
-  using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 drop policy if exists "profiles_update_own" on profiles;
 create policy "profiles_update_own"
@@ -172,12 +176,7 @@ create policy "profiles_update_own"
 drop policy if exists "profiles_update_admin" on profiles;
 create policy "profiles_update_admin"
   on profiles for update
-  using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 -- ---- products ------------------------------------------------
 alter table products enable row level security;
@@ -190,42 +189,22 @@ create policy "products_select_published"
 drop policy if exists "products_select_admin" on products;
 create policy "products_select_admin"
   on products for select
-  using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 drop policy if exists "products_insert_admin" on products;
 create policy "products_insert_admin"
   on products for insert
-  with check (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
-  );
+  with check (public.is_admin());
 
 drop policy if exists "products_update_admin" on products;
 create policy "products_update_admin"
   on products for update
-  using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 drop policy if exists "products_delete_admin" on products;
 create policy "products_delete_admin"
   on products for delete
-  using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 -- ---- orders --------------------------------------------------
 alter table orders enable row level security;
@@ -246,12 +225,7 @@ create policy "orders_insert_own"
 drop policy if exists "orders_update_admin" on orders;
 create policy "orders_update_admin"
   on orders for update
-  using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 -- ---- coupons -------------------------------------------------
 alter table coupons enable row level security;
@@ -264,12 +238,7 @@ create policy "coupons_select_active"
 drop policy if exists "coupons_all_admin" on coupons;
 create policy "coupons_all_admin"
   on coupons for all
-  using (
-    exists (
-      select 1 from profiles p
-      where p.id = auth.uid() and p.role = 'admin'
-    )
-  );
+  using (public.is_admin());
 
 -- BUG #14: No middleware / RLS restriction prevents non-admin users
 -- from accessing admin pages. This is handled (or rather NOT handled)
