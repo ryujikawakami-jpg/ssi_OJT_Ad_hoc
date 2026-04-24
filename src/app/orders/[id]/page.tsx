@@ -42,16 +42,21 @@ export default function OrderDetailPage({ params }: { params: Promise<{ id: stri
       <div className="grid flex-1" style={{ gridTemplateColumns: "1.2fr 1fr", gap: 56, padding: "32px 44px" }}>
         <div>
           <div className="grid gap-3.5 mt-4">
-            {order.items.map((item, i) => (
-              <div key={i} className="grid items-center gap-3" style={{ gridTemplateColumns: "56px 1fr auto" }}>
-                <ProductImage label="" tonal={item.tonal || "a"} height={56} />
-                <div>
-                  <div style={{ fontFamily: "var(--font-serif-jp)", fontSize: 13 }}>{item.name_jp}</div>
-                  <div className="mono" style={{ fontSize: 10, color: "var(--sd-ink-4)", marginTop: 2 }}>× {item.quantity}</div>
+            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+            {order.items.map((item: any, i: number) => {
+              const name = item.name_jp || item.name || "不明";
+              const qty = item.quantity ?? item.qty ?? 0;
+              return (
+                <div key={i} className="grid items-center gap-3" style={{ gridTemplateColumns: "56px 1fr auto" }}>
+                  <ProductImage label="" tonal={item.tonal || "a"} height={56} />
+                  <div>
+                    <div style={{ fontFamily: "var(--font-serif-jp)", fontSize: 13 }}>{name}</div>
+                    <div className="mono" style={{ fontSize: 10, color: "var(--sd-ink-4)", marginTop: 2 }}>× {qty}</div>
+                  </div>
+                  <span className="mono text-sm">¥{(item.price * qty).toLocaleString()}</span>
                 </div>
-                <span className="mono text-sm">¥{(item.price * item.quantity).toLocaleString()}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="grid gap-2 mt-5 text-xs" style={{ borderTop: "var(--sd-line)", paddingTop: 16 }}>

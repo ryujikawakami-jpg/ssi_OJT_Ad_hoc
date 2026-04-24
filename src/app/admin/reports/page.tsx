@@ -74,12 +74,17 @@ export default function AdminReportsPage() {
   const topSellers = useMemo(() => {
     const sales: Record<string, { name: string; qty: number; revenue: number }> = {};
     filteredOrders.forEach((o) => {
-      o.items.forEach((item) => {
-        if (!sales[item.product_id]) {
-          sales[item.product_id] = { name: item.name_jp, qty: 0, revenue: 0 };
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      o.items.forEach((item: any) => {
+        const key = item.product_id || item.sku || item.name;
+        const name = item.name_jp || item.name || "不明";
+        const qty = item.quantity ?? item.qty ?? 0;
+        const price = item.price ?? 0;
+        if (!sales[key]) {
+          sales[key] = { name, qty: 0, revenue: 0 };
         }
-        sales[item.product_id].qty += item.quantity;
-        sales[item.product_id].revenue += item.price * item.quantity;
+        sales[key].qty += qty;
+        sales[key].revenue += price * qty;
       });
     });
     return Object.values(sales).sort((a, b) => b.revenue - a.revenue).slice(0, 5);

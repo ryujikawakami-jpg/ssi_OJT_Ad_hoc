@@ -37,12 +37,15 @@ export interface Order {
 }
 
 export interface OrderItem {
-  product_id: string;
-  name_jp: string;
-  name_en: string;
+  product_id?: string;
+  sku?: string;
+  name_jp?: string;
+  name_en?: string;
+  name?: string;
   price: number;
-  quantity: number;
-  tonal: string;
+  quantity?: number;
+  qty?: number;
+  tonal?: string;
 }
 
 export interface UserProfile {

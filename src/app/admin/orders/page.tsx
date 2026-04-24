@@ -17,7 +17,10 @@ export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState("すべて");
   const [startDate, setStartDate] = useState("2025-09-01");
-  const [endDate, setEndDate] = useState(new Date().toISOString().split("T")[0]);
+  // デフォルト終了日を明日に設定（BUG #19 の < 比較でも今日の注文が初回表示される）
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const [endDate, setEndDate] = useState(tomorrow.toISOString().split("T")[0]);
 
   useEffect(() => {
     loadOrders();

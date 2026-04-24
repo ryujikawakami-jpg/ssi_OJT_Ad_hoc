@@ -84,7 +84,7 @@ export default function OrderHistoryPage() {
                   {new Date(o.created_at).toLocaleDateString("ja-JP", { year: "numeric", month: "2-digit", day: "2-digit" }).replace(/\//g, ".")}
                 </td>
                 <td style={{ padding: "18px 0", fontFamily: "var(--font-serif-jp)" }}>
-                  {o.items[0]?.name_jp}{o.items.length > 1 ? ` ほか ${o.items.length - 1} 品` : ""}
+                  {o.items[0]?.name_jp || o.items[0]?.name}{o.items.length > 1 ? ` ほか ${o.items.length - 1} 品` : ""}
                 </td>
                 <td className="mono" style={{ padding: "18px 0" }}>¥{o.total.toLocaleString()}</td>
                 <td style={{ padding: "18px 0" }}>
