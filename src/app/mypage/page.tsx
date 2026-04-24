@@ -23,6 +23,7 @@ export default function MyPagePage() {
   });
   const [pwForm, setPwForm] = useState({ current: "", newPw: "", confirm: "" });
   const [saved, setSaved] = useState(false);
+  const [pwError, setPwError] = useState("");
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
 
   useEffect(() => {
@@ -60,13 +61,20 @@ export default function MyPagePage() {
   };
 
   const handleSavePassword = async () => {
-    // BUG: #9 — パスワード変更で「新しいパスワード」と「確認用」が一致しなくても保存できる
+    setPwError("");
+    // BUG: #9 — パスワード変更で「新しいパスワード」と「確認用」が一致しなくても保存処理が実行される
     // newPw === confirm の検証が抜けている
+    if (!pwForm.newPw) {
+      setPwError("新しいパスワードを入力してください。");
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password: pwForm.newPw });
-    if (!error) {
+    if (error) {
+      setPwError(error.message || "パスワードの変更に失敗しました。");
+    } else {
       setSaved(true);
       setPwForm({ current: "", newPw: "", confirm: "" });
-      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => setSaved(false), 3000);
     }
   };
 
@@ -211,6 +219,7 @@ export default function MyPagePage() {
                   <label className="sd-field-label">新しいパスワード（確認） · Confirm</label>
                   <input className="sd-input" type="password" value={pwForm.confirm} onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })} />
                 </div>
+                {pwError && <div className="text-xs" style={{ color: "var(--sd-wine)" }}>{pwError}</div>}
                 {/* BUG: #9 — newPw !== confirm でも保存ボタンが有効 */}
                 <button className="sd-btn sd-btn--primary" onClick={handleSavePassword}>
                   パスワードを変更 <span className="arr">→</span>
