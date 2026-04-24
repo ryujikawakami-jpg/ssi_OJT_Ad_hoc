@@ -16,14 +16,18 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Supabase Auth APIを直接呼ぶ（AuthContextを経由しない）
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         setError("メールアドレスまたはパスワードが正しくありません。");
         setLoading(false);
+        return;
+      }
+      if (data?.session) {
+        // セッション確立済み。ハードリロードで遷移
+        window.location.replace("/products");
       } else {
-        // ハードリロードで遷移（AuthContext再初期化を確実にする）
-        window.location.href = "/products";
+        setError("ログインに成功しましたが、セッションが取得できませんでした。ページを再読み込みしてください。");
+        setLoading(false);
       }
     } catch (err) {
       console.error("Sign in error:", err);
