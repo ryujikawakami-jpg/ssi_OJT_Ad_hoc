@@ -17,17 +17,25 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    // タイムアウト付きsignIn
+    const timeout = new Promise<{ error: string }>((resolve) =>
+      setTimeout(() => resolve({ error: "接続がタイムアウトしました。再度お試しください。" }), 10000)
+    );
+
     try {
-      const result = await signIn(email, password);
+      const result = await Promise.race([signIn(email, password), timeout]);
       if (result.error) {
-        setError("メールアドレスまたはパスワードが正しくありません。");
+        setError(result.error === "接続がタイムアウトしました。再度お試しください。"
+          ? result.error
+          : "メールアドレスまたはパスワードが正しくありません。");
       } else {
         router.push("/products");
         return;
       }
     } catch (err) {
       console.error("Sign in error:", err);
-      setError("ログイン中にエラーが発生しました。");
+      setError("ログイン中にエラーが発生しました。再度お試しください。");
     }
     setLoading(false);
   };
@@ -74,20 +82,26 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="grid gap-6 mt-10" style={{ maxWidth: 380 }}>
           <div>
-            <label className="sd-field-label">メールアドレス · Email</label>
+            <label className="sd-field-label" htmlFor="login-email">メールアドレス · Email</label>
             <input
+              id="login-email"
+              name="email"
               className="sd-input"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
             />
           </div>
           <div>
-            <label className="sd-field-label">パスワード · Password</label>
+            <label className="sd-field-label" htmlFor="login-password">パスワード · Password</label>
             <input
+              id="login-password"
+              name="password"
               className="sd-input"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
