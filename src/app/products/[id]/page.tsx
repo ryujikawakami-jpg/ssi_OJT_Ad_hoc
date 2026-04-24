@@ -37,8 +37,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const handleAdd = () => {
     // BUG: #6 — 数量に0以下の値を入力できる（マイナス値でカートに追加できる）
-    // qty > 0 の判定なし
-    // BUG: #2 — 在庫数を超える数量でもカートに追加できる（qty <= stock の判定なし）
+    // qty > 0 の判定なし。在庫上限チェックもなし
     addItem(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
@@ -116,8 +115,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <div>
               <label className="sd-field-label">数量 · Quantity</label>
               <div className="inline-flex" style={{ border: "var(--sd-line-strong)", borderRadius: 2 }}>
-                {/* BUG: #6 — min属性なし。マイナスにもできる */}
-                {/* BUG: #2 — 在庫数を超える数量を指定できる（max制限なし） */}
+                {/* BUG: #6 — min属性なし。マイナスにもできる。在庫上限チェックもなし */}
                 <button
                   onClick={() => setQuantity((q) => q - 1)}
                   className="bg-transparent border-none cursor-pointer"

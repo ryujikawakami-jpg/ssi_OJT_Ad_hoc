@@ -37,8 +37,6 @@ export default function AdminProductsPage() {
   };
 
   const handleSave = async (id: string) => {
-    // BUG: #8 — 価格に小数点以下3桁以上の値を登録できる
-    // step未設定、Math.round(x*100)/100 チェックなし
     const price = parseFloat(editPrice);
     const stock = parseInt(editStock, 10);
     await supabase.from("products").update({ price, stock }).eq("id", id);
@@ -142,7 +140,6 @@ export default function AdminProductsPage() {
                   <td style={{ padding: "12px 16px", color: "var(--sd-ink-2)" }}>{p.category}</td>
                   <td style={{ padding: "12px 16px", textAlign: "right" }}>
                     {isEditing ? (
-                      /* BUG: #8 — step未設定、小数3桁以上入力可能 */
                       <input
                         className="sd-input mono"
                         type="number"
@@ -194,17 +191,42 @@ export default function AdminProductsPage() {
                         保存
                       </button>
                     ) : (
-                      <button
-                        className="bg-transparent border-none cursor-pointer"
-                        style={{ color: "var(--sd-ink-3)", fontSize: 11 }}
-                        onClick={() => {
-                          setEditingId(p.id);
-                          setEditPrice(String(p.price));
-                          setEditStock(String(p.stock));
-                        }}
-                      >
-                        編集 · 複製 · 非公開
-                      </button>
+                      <span style={{ fontSize: 11, display: "inline-flex", gap: 8 }}>
+                        <button
+                          className="bg-transparent border-none cursor-pointer"
+                          style={{ color: "var(--sd-ink-3)" }}
+                          onClick={() => {
+                            setEditingId(p.id);
+                            setEditPrice(String(p.price));
+                            setEditStock(String(p.stock));
+                          }}
+                        >
+                          編集
+                        </button>
+                        {/* BUG: #8 — 「複製」「非公開」を押しても編集モードになるだけで機能しない */}
+                        <button
+                          className="bg-transparent border-none cursor-pointer"
+                          style={{ color: "var(--sd-ink-3)" }}
+                          onClick={() => {
+                            setEditingId(p.id);
+                            setEditPrice(String(p.price));
+                            setEditStock(String(p.stock));
+                          }}
+                        >
+                          複製
+                        </button>
+                        <button
+                          className="bg-transparent border-none cursor-pointer"
+                          style={{ color: "var(--sd-ink-3)" }}
+                          onClick={() => {
+                            setEditingId(p.id);
+                            setEditPrice(String(p.price));
+                            setEditStock(String(p.stock));
+                          }}
+                        >
+                          非公開
+                        </button>
+                      </span>
                     )}
                   </td>
                 </tr>
