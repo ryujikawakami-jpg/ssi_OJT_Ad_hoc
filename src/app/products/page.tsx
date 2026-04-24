@@ -183,11 +183,11 @@ export default function ProductListingPage() {
 
         {/* Grid */}
         <div style={{ padding: "32px 44px", overflow: "auto" }}>
-          <div className="grid gap-7" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
+          {/* BUG: #1 — グリッドセルを固定幅にし、長い商品名がカードから突き出す */}
+          <div className="grid gap-7" style={{ gridTemplateColumns: "repeat(4, minmax(0, 1fr))" }}>
             {filtered.map((p, i) => (
-              <Link href={`/products/${p.id}`} key={p.id} className="no-underline text-inherit">
-                {/* BUG: #1 — 商品名が長い場合に折り返されず、カードからはみ出す */}
-                <article style={{ minWidth: 0, overflow: "visible" }}>
+              <Link href={`/products/${p.id}`} key={p.id} className="no-underline text-inherit" style={{ minWidth: 0, overflow: "visible", display: "block" }}>
+                <article style={{ overflow: "visible" }}>
                   <ProductImage
                     label={`NO. ${String(i + 1).padStart(2, "0")}`}
                     subLabel={p.name_en.toUpperCase()}
