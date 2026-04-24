@@ -76,7 +76,7 @@ export default function MyPagePage() {
     { id: "favorites", jp: "お気に入り", en: "Favorites", disabled: true },
     { id: "addresses", jp: "配送先", en: "Addresses", disabled: true },
     { id: "password", jp: "パスワード変更", en: "Password" },
-    { id: "signout", jp: "ログアウト", en: "Sign Out" },
+    { id: "signout", jp: "ログアウト", en: "Sign Out", disabled: true },
   ];
 
   return (
