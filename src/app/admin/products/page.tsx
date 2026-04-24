@@ -68,8 +68,8 @@ export default function AdminProductsPage() {
           <h1 style={{ fontSize: 26, marginTop: 2 }}>商品管理</h1>
         </div>
         <div className="flex gap-2.5">
-          <button className="sd-btn sd-btn--ghost">CSV書き出し</button>
-          <button className="sd-btn sd-btn--primary">＋ 商品を追加</button>
+          <button className="sd-btn sd-btn--ghost" disabled style={{ opacity: 0.4, cursor: "not-allowed", borderColor: "var(--sd-ink-4)", color: "var(--sd-ink-4)" }}>CSV書き出し</button>
+          <button className="sd-btn sd-btn--primary" disabled style={{ opacity: 0.4, cursor: "not-allowed", background: "var(--sd-stone)", color: "var(--sd-ink-4)" }}>＋ 商品を追加</button>
         </div>
       </div>
 

@@ -16,7 +16,7 @@ export default function ProductImage({ label, subLabel, tonal = "a", height = 36
           <div className="tag">{label}</div>
           {subLabel && <div className="tag mt-0.5">{subLabel}</div>}
         </div>
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-end" style={{ flexShrink: 0, whiteSpace: "nowrap" }}>
           {children}
         </div>
       </div>

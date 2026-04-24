@@ -17,15 +17,28 @@ export default function ProductListingPage() {
   const [sort, setSort] = useState<SortKey>("newest");
   const [search, setSearch] = useState("");
 
+  const [fetchError, setFetchError] = useState(false);
+
   useEffect(() => {
-    const load = async () => {
+    const load = async (retries = 2) => {
       const { data, error } = await supabase
         .from("products")
         .select("*")
         .eq("status", "公開")
         .order("created_at", { ascending: false });
-      if (error) console.error("Products fetch error:", error);
-      if (data) setProducts(data as Product[]);
+      if (error) {
+        console.error("Products fetch error:", error);
+        if (retries > 0) {
+          setTimeout(() => load(retries - 1), 1500);
+          return;
+        }
+        setFetchError(true);
+        return;
+      }
+      if (data) {
+        setProducts(data as Product[]);
+        setFetchError(false);
+      }
     };
     load();
   }, []);
@@ -207,7 +220,21 @@ export default function ProductListingPage() {
               </Link>
             ))}
           </div>
-          {filtered.length === 0 && (
+          {fetchError && (
+            <div className="text-center py-20">
+              <div className="mono" style={{ fontSize: 12, color: "var(--sd-ink-4)", letterSpacing: "0.2em" }}>— 500 —</div>
+              <h3 style={{ fontFamily: "var(--font-serif-jp)", fontSize: 22, marginTop: 14 }}>商品の読み込みに失敗しました。</h3>
+              <p className="mt-3 text-sm" style={{ color: "var(--sd-ink-2)" }}>少し時間をおいて、ページを再読み込みしてください。</p>
+              <button className="sd-btn sd-btn--primary mt-5" onClick={() => window.location.reload()}>再読み込み</button>
+            </div>
+          )}
+          {!fetchError && filtered.length === 0 && products.length === 0 && (
+            <div className="text-center py-20">
+              <div className="sd-skel" style={{ width: 200, height: 14, margin: "0 auto" }} />
+              <div className="sd-skel mt-3" style={{ width: 140, height: 10, margin: "0 auto" }} />
+            </div>
+          )}
+          {!fetchError && filtered.length === 0 && products.length > 0 && (
             <div className="text-center py-20">
               <h3 style={{ fontFamily: "var(--font-serif-jp)", fontSize: 22 }}>該当する品がありませんでした。</h3>
               <div className="en mt-1.5" style={{ fontSize: 10 }}>Nothing matches — try another word.</div>
