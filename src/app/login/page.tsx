@@ -21,15 +21,15 @@ export default function LoginPage() {
       const result = await signIn(email, password);
       if (result.error) {
         setError("メールアドレスまたはパスワードが正しくありません。");
-        setLoading(false);
       } else {
         router.push("/products");
+        return;
       }
     } catch (err) {
       console.error("Sign in error:", err);
       setError("ログイン中にエラーが発生しました。");
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   // BUG: #5 — パスワードが空欄でもログインボタンが活性化している
