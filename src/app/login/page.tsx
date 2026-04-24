@@ -17,12 +17,18 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const result = await signIn(email, password);
-    if (result.error) {
-      setError("メールアドレスまたはパスワードが正しくありません。");
+    try {
+      const result = await signIn(email, password);
+      if (result.error) {
+        setError("メールアドレスまたはパスワードが正しくありません。");
+        setLoading(false);
+      } else {
+        router.push("/products");
+      }
+    } catch (err) {
+      console.error("Sign in error:", err);
+      setError("ログイン中にエラーが発生しました。");
       setLoading(false);
-    } else {
-      router.push("/products");
     }
   };
 
@@ -97,9 +103,9 @@ export default function LoginPage() {
               <input type="checkbox" defaultChecked className="w-3.5 h-3.5" />
               ログイン状態を保持する
             </label>
-            <a style={{ color: "var(--sd-ink-2)", textDecoration: "underline", textUnderlineOffset: 3 }}>
+            <span style={{ color: "var(--sd-ink-4)", opacity: 0.5, cursor: "not-allowed" }}>
               パスワードをお忘れですか？
-            </a>
+            </span>
           </div>
 
           {/* BUG: #5 — disabled={!email} のみ。password を判定していない */}
@@ -112,17 +118,15 @@ export default function LoginPage() {
             {loading ? "ログイン中..." : "ログイン"} <span className="arr">→</span>
           </button>
 
-          <div className="text-center text-xs" style={{ color: "var(--sd-ink-3)", marginTop: 8 }}>
+          <div className="text-center text-xs" style={{ color: "var(--sd-ink-4)", marginTop: 8, opacity: 0.5 }}>
             はじめての方は{" "}
-            <a style={{ color: "var(--sd-forest)", textDecoration: "underline", textUnderlineOffset: 3 }}>
-              新規会員登録
-            </a>
+            <span style={{ cursor: "not-allowed" }}>新規会員登録</span>
           </div>
         </form>
 
         <div className="mt-auto pt-16 flex justify-between" style={{ fontSize: 10, color: "var(--sd-ink-4)" }}>
           <span className="mono">© 2026 ShopDemo Co., Ltd.</span>
-          <span className="en-caps">Privacy · Terms · Cookies</span>
+          <span style={{ opacity: 0.5 }} className="en-caps">Privacy · Terms · Cookies</span>
         </div>
       </div>
     </div>
