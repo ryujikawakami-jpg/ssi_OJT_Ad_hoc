@@ -38,14 +38,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const handleAdd = () => {
     // BUG: #6 — 数量に0以下の値を入力できる（マイナス値でカートに追加できる）
     // qty > 0 の判定なし
+    // BUG: #2 — 在庫数を超える数量でもカートに追加できる（qty <= stock の判定なし）
     addItem(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 2000);
   };
 
-  // BUG: #2 — 在庫数が0のとき「在庫あり」と表示される
-  // stock >= 0 でチェック（0含む）
-  const stockLabel = product.stock >= 0 ? "在庫あり" : "在庫なし";
+  // 在庫表示（正しい実装）
+  const stockLabel = product.stock > 5 ? "在庫あり" : product.stock > 0 ? "在庫わずか" : "入荷待ち";
   const stockColor = product.stock > 5 ? "var(--sd-moss)" : product.stock > 0 ? "var(--sd-ochre)" : "var(--sd-wine)";
 
   // BUG: #17 — 在庫0でも「カートに追加」ボタンが押せてカートに入る
@@ -81,7 +81,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {product.name_jp}
           </h1>
           <div className="flex gap-2.5 mt-3.5">
-            {/* BUG: #2 — 在庫0でも「在庫あり」表示 */}
             <span className="sd-tag sd-tag--sage" style={{ color: stockColor, borderColor: stockColor }}>{stockLabel}</span>
             <span className="sd-tag">産地 · {product.origin}</span>
           </div>
@@ -118,6 +117,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <label className="sd-field-label">数量 · Quantity</label>
               <div className="inline-flex" style={{ border: "var(--sd-line-strong)", borderRadius: 2 }}>
                 {/* BUG: #6 — min属性なし。マイナスにもできる */}
+                {/* BUG: #2 — 在庫数を超える数量を指定できる（max制限なし） */}
                 <button
                   onClick={() => setQuantity((q) => q - 1)}
                   className="bg-transparent border-none cursor-pointer"

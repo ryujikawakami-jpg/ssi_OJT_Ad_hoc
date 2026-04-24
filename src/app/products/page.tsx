@@ -186,7 +186,8 @@ export default function ProductListingPage() {
           <div className="grid gap-7" style={{ gridTemplateColumns: "repeat(4, 1fr)" }}>
             {filtered.map((p, i) => (
               <Link href={`/products/${p.id}`} key={p.id} className="no-underline text-inherit">
-                <article>
+                {/* BUG: #1 — 商品名が長い場合に折り返されず、カードからはみ出す */}
+                <article style={{ minWidth: 0, overflow: "visible" }}>
                   <ProductImage
                     label={`NO. ${String(i + 1).padStart(2, "0")}`}
                     subLabel={p.name_en.toUpperCase()}
@@ -196,8 +197,7 @@ export default function ProductListingPage() {
                     {p.stock === 0 && <span className="sd-tag sd-tag--wine">入荷待ち</span>}
                     {p.stock > 0 && p.stock <= 5 && <span className="sd-tag sd-tag--sage">在庫わずか</span>}
                   </ProductImage>
-                  <div className="mt-3.5">
-                    {/* BUG: #1 — 商品名が長い場合に折り返されず、カードからはみ出す */}
+                  <div className="mt-3.5" style={{ overflow: "visible" }}>
                     <div
                       style={{
                         fontFamily: "var(--font-serif-jp)",
