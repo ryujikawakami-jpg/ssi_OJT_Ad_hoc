@@ -21,23 +21,39 @@ export default function ProductListingPage() {
 
   useEffect(() => {
     const load = async (retries = 2) => {
-      const { data, error } = await supabase
-        .from("products")
-        .select("*")
-        .eq("status", "公開")
-        .order("created_at", { ascending: false });
-      if (error) {
-        console.error("Products fetch error:", error);
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("status", "公開")
+          .order("created_at", { ascending: false })
+          .abortSignal(controller.signal);
+
+        clearTimeout(timeoutId);
+
+        if (error) {
+          console.error("Products fetch error:", error);
+          if (retries > 0) {
+            setTimeout(() => load(retries - 1), 2000);
+            return;
+          }
+          setFetchError(true);
+          return;
+        }
+        if (data) {
+          setProducts(data as Product[]);
+          setFetchError(false);
+        }
+      } catch (e) {
+        console.error("Products fetch exception:", e);
         if (retries > 0) {
-          setTimeout(() => load(retries - 1), 1500);
+          setTimeout(() => load(retries - 1), 2000);
           return;
         }
         setFetchError(true);
-        return;
-      }
-      if (data) {
-        setProducts(data as Product[]);
-        setFetchError(false);
       }
     };
     load();
