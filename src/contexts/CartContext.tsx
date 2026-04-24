@@ -1,12 +1,11 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode, useRef } from "react";
+import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import type { Product, CartItem } from "@/lib/types";
 
 interface CartState {
   items: CartItem[];
   totalCount: number;
-  headerBadgeCount: number;
   addItem: (product: Product, quantity: number) => void;
   removeItem: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
@@ -17,7 +16,6 @@ interface CartState {
 const CartContext = createContext<CartState>({
   items: [],
   totalCount: 0,
-  headerBadgeCount: 0,
   addItem: () => {},
   removeItem: () => {},
   updateQuantity: () => {},
@@ -27,42 +25,31 @@ const CartContext = createContext<CartState>({
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
-  // BUG: #3 — 商品を削除後、件数バッジが更新されない
-  // headerBadgeCount は追加時のみ更新し、削除時には更新しない
-  const headerBadgeRef = useRef(0);
-  const [headerBadgeCount, setHeaderBadgeCount] = useState(0);
 
+  // BUG: #3 — マイナス数量でカートに追加すると、合計数量・金額がマイナスになる
+  // addItem で quantity のバリデーションをしていないため、負の値がそのまま加算される
   const totalCount = items.reduce((s, i) => s + i.quantity, 0);
 
   const addItem = useCallback((product: Product, quantity: number) => {
+    // BUG: #3 — quantity が負でもそのまま追加。バリデーションなし
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
-      let newItems: CartItem[];
       if (existing) {
-        newItems = prev.map((i) =>
+        return prev.map((i) =>
           i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i
         );
-      } else {
-        newItems = [...prev, { product, quantity }];
       }
-      // バッジカウントは追加時に更新
-      const newTotal = newItems.reduce((s, i) => s + i.quantity, 0);
-      headerBadgeRef.current = newTotal;
-      setHeaderBadgeCount(newTotal);
-      return newItems;
+      return [...prev, { product, quantity }];
     });
   }, []);
 
   const removeItem = useCallback((productId: string) => {
     setItems((prev) => prev.filter((i) => i.product.id !== productId));
-    // BUG: #3 — 削除時にheaderBadgeCountを更新しない
-    // setHeaderBadgeCount は呼ばない
   }, []);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity <= 0) {
       setItems((prev) => prev.filter((i) => i.product.id !== productId));
-      // BUG: #3 — 数量0以下で削除してもバッジ更新しない
       return;
     }
     setItems((prev) =>
@@ -72,8 +59,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = useCallback(() => {
     setItems([]);
-    headerBadgeRef.current = 0;
-    setHeaderBadgeCount(0);
   }, []);
 
   // BUG: #10 — 小計が単価×個数ではなく単価のみ表示
@@ -82,7 +67,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider
-      value={{ items, totalCount, headerBadgeCount, addItem, removeItem, updateQuantity, clearCart, subtotal }}
+      value={{ items, totalCount, addItem, removeItem, updateQuantity, clearCart, subtotal }}
     >
       {children}
     </CartContext.Provider>

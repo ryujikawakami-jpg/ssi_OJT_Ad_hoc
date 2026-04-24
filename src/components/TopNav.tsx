@@ -12,8 +12,8 @@ export default function TopNav() {
   const { items, totalCount } = useCart();
   const { user, signOut } = useAuth();
 
-  // BUG: #3 — 商品を削除後、件数バッジが更新されない
-  // CartContext側で headerCount を別管理し、削除時に更新しない
+  // BUG: #3 — マイナス数量でカートに追加すると、バッジやカート合計がマイナスになる
+  // BUG: #6 と連動。数量バリデーションなしのため負の値がそのまま反映される
   const displayCount = totalCount;
 
   const navItems = [
