@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
-import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -11,39 +9,27 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
-  const router = useRouter();
-
-  // ページ読み込み時にSupabaseをウォームアップ
-  useState(() => {
-    supabase.from("products").select("id").limit(1).then(() => {});
-  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    // タイムアウト付きsignIn（Supabase無料枠のコールドスタート対策で20秒）
-    const timeout = new Promise<{ error: string }>((resolve) =>
-      setTimeout(() => resolve({ error: "接続がタイムアウトしました。しばらく待ってから再度お試しください。" }), 20000)
-    );
-
     try {
-      const result = await Promise.race([signIn(email, password), timeout]);
-      if (result.error) {
-        setError(result.error === "接続がタイムアウトしました。再度お試しください。"
-          ? result.error
-          : "メールアドレスまたはパスワードが正しくありません。");
+      // Supabase Auth APIを直接呼ぶ（AuthContextを経由しない）
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setError("メールアドレスまたはパスワードが正しくありません。");
+        setLoading(false);
       } else {
-        router.push("/products");
-        return;
+        // ハードリロードで遷移（AuthContext再初期化を確実にする）
+        window.location.href = "/products";
       }
     } catch (err) {
       console.error("Sign in error:", err);
       setError("ログイン中にエラーが発生しました。再度お試しください。");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // BUG: #5 — パスワードが空欄でもログインボタンが活性化している
