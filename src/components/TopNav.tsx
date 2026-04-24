@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Logo from "./Logo";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function TopNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const { items, totalCount } = useCart();
   const { user, signOut } = useAuth();
 
@@ -70,7 +71,7 @@ export default function TopNav() {
           <>
             <Link href="/mypage" className="en-caps no-underline">Account</Link>
             {user.role === "admin" && <Link href="/admin/products" className="en-caps no-underline">Admin</Link>}
-            <button onClick={signOut} className="en-caps cursor-pointer bg-transparent border-none">Sign Out</button>
+            <button onClick={async () => { await signOut(); router.push("/login"); }} className="en-caps cursor-pointer bg-transparent border-none">Sign Out</button>
           </>
         ) : (
           <Link href="/login" className="en-caps no-underline">Sign In</Link>

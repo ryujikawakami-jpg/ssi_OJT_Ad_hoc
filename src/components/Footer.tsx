@@ -20,10 +20,10 @@ export default function Footer() {
         <p className="en mt-2" style={{ fontSize: 9 }}>Quiet tools for a considered life.</p>
       </div>
       {columns.map((col) => (
-        <div key={col.h}>
-          <div style={{ fontFamily: "var(--font-serif-jp)", fontSize: 13, color: "var(--sd-ink)", marginBottom: 4 }}>{col.h}</div>
+        <div key={col.h} style={{ opacity: 0.4 }}>
+          <div style={{ fontFamily: "var(--font-serif-jp)", fontSize: 13, color: "var(--sd-ink-4)", marginBottom: 4 }}>{col.h}</div>
           <div className="en-caps" style={{ fontSize: 9, marginBottom: 14 }}>{col.en}</div>
-          <ul className="list-none p-0 m-0 grid gap-2">
+          <ul className="list-none p-0 m-0 grid gap-2" style={{ color: "var(--sd-ink-4)", cursor: "not-allowed" }}>
             {col.items.map((i) => <li key={i}>{i}</li>)}
           </ul>
         </div>
