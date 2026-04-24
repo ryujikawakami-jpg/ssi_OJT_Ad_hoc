@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,14 +14,19 @@ export default function LoginPage() {
   const { signIn } = useAuth();
   const router = useRouter();
 
+  // ページ読み込み時にSupabaseをウォームアップ
+  useState(() => {
+    supabase.from("products").select("id").limit(1).then(() => {});
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
-    // タイムアウト付きsignIn
+    // タイムアウト付きsignIn（Supabase無料枠のコールドスタート対策で20秒）
     const timeout = new Promise<{ error: string }>((resolve) =>
-      setTimeout(() => resolve({ error: "接続がタイムアウトしました。再度お試しください。" }), 10000)
+      setTimeout(() => resolve({ error: "接続がタイムアウトしました。しばらく待ってから再度お試しください。" }), 20000)
     );
 
     try {
