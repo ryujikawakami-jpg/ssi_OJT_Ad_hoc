@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
-import { useAuth } from "@/contexts/AuthContext";
+
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth();
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,19 +18,42 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const result = await signIn(email, password);
-      if (result.error) {
+      // Supabase JSクライアントのロック問題を回避するためREST API直接呼び出し
+      const res = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          apikey: SUPABASE_KEY,
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
         setError("メールアドレスまたはパスワードが正しくありません。");
-      } else {
-        // ソフトナビゲーション（リロードしない→セッション維持）
-        router.push("/products");
+        setLoading(false);
         return;
       }
+
+      const data = await res.json();
+
+      // セッションをlocalStorageに保存（Supabaseクライアントが復元できる形式）
+      const storageKey = `sb-${new URL(SUPABASE_URL).hostname.split(".")[0]}-auth-token`;
+      localStorage.setItem(storageKey, JSON.stringify({
+        access_token: data.access_token,
+        refresh_token: data.refresh_token,
+        expires_at: Math.floor(Date.now() / 1000) + data.expires_in,
+        expires_in: data.expires_in,
+        token_type: data.token_type,
+        user: data.user,
+      }));
+
+      // ハードナビゲーションでAuthContext再初期化
+      window.location.href = "/products";
     } catch (err) {
       console.error("Sign in error:", err);
       setError("ログイン中にエラーが発生しました。再度お試しください。");
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   // BUG: #5 — パスワードが空欄でもログインボタンが活性化している
