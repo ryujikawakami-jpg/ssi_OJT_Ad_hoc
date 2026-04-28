@@ -90,8 +90,8 @@ async function main() {
   // 2. Re-seed orders via seed.sql
   console.log("2. Re-seeding orders...");
 
-  const adminUid = "3cada532-8fdc-4009-af23-0c6213a37b5f";
-  const userUid = "9a8c4b56-5348-4c71-9078-c7afbbe027fe";
+  const adminUid = "4012a192-4124-415d-9147-d7fe56c9e84f";
+  const userUid = "2eb7d4c0-fbf7-4c16-8161-8b30383a18ac";
 
   // Seed orders via individual inserts using the JS client
   console.log("   Seeding orders via individual inserts...");
