@@ -68,15 +68,17 @@ export default function ProductListingPage() {
     // Search filter
     if (search) {
       // BUG: #20 — 検索に特殊文字（%, _）を入力すると全件表示される
-      // SQLのLIKE用エスケープをしていないため、%や_が全件マッチする
-      result = result.filter((p) => {
-        const q = search.toLowerCase();
-        return (
+      // %や_をワイルドカードとして扱ってしまい、全件マッチする
+      const q = search.toLowerCase();
+      const hasWildcard = q.includes("%") || q.includes("_");
+      if (!hasWildcard) {
+        result = result.filter((p) =>
           p.name_jp.toLowerCase().includes(q) ||
           p.name_en.toLowerCase().includes(q) ||
           p.category.toLowerCase().includes(q)
         );
-      });
+      }
+      // hasWildcard=true の場合、フィルタをスキップ → 全件表示（バグ）
     }
 
     // Category filter
