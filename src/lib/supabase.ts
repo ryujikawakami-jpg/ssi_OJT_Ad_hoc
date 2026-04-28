@@ -9,5 +9,9 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     detectSessionInUrl: false,
     flowType: "implicit",
+    // navigator.locks のロック競合を回避するカスタム実装
+    lock: async <R,>(_name: string, _acquireTimeout: number, fn: () => Promise<R>): Promise<R> => {
+      return await fn();
+    },
   },
 });

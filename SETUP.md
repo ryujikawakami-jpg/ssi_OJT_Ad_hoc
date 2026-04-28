@@ -6,7 +6,7 @@
 2. **Project Settings > API** から以下を取得:
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `service_role` key → `SUPABASE_SERVICE_KEY`（リセットスクリプト用）
+   - `service_role` key → `SUPABASE_SERVICE_KEY`=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indib3N6dWl5dHBjcXFpdXZyY3h0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjkyNTQ5MywiZXhwIjoyMDkyNTAxNDkzfQ.3fcs_pVqM96sB632NH0jK-GPY5WLaKj_a5Cyr89wYdo（リセットスクリプト用）
 
 ## 2. データベース初期化
 
