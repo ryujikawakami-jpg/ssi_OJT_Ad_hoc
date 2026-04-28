@@ -222,7 +222,6 @@ export default function CheckoutPage() {
         </div>
 
         {/* Right: Summary */}
-        {/* BUG: #2 — 注文確認画面に商品明細が表示されない（金額サマリーのみ） */}
         <aside style={{ borderLeft: "var(--sd-line)", background: "var(--sd-paper)", padding: 32 }}>
           <div className="en-caps">Order Summary</div>
           <h3 style={{ fontSize: 18, marginTop: 4 }}>ご注文内容</h3>
