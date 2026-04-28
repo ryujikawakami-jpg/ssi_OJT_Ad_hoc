@@ -4,7 +4,6 @@ import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import StoreLayout from "@/components/StoreLayout";
 import ProductImage from "@/components/ProductImage";
-import { supabase } from "@/lib/supabase";
 import type { Product } from "@/lib/types";
 
 const CATEGORIES = ["すべて", "陶器", "木工", "テキスタイル", "金工", "ガラス", "家具"];
@@ -22,33 +21,29 @@ export default function ProductListingPage() {
   useEffect(() => {
     const load = async (retries = 2) => {
       try {
+        // 認証状態に依存しないよう、anon keyでREST APIを直接呼ぶ
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-        const { data, error } = await supabase
-          .from("products")
-          .select("*")
-          .eq("status", "公開")
-          .order("created_at", { ascending: false })
-          .abortSignal(controller.signal);
-
+        const res = await fetch(
+          `${url}/rest/v1/products?select=*&status=eq.公開&order=created_at.desc`,
+          {
+            headers: { apikey: key!, Authorization: `Bearer ${key}` },
+            signal: controller.signal,
+          }
+        );
         clearTimeout(timeoutId);
 
-        if (error) {
-          console.error("Products fetch error:", error);
-          if (retries > 0) {
-            setTimeout(() => load(retries - 1), 2000);
-            return;
-          }
-          setFetchError(true);
-          return;
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
         }
-        if (data) {
-          setProducts(data as Product[]);
-          setFetchError(false);
-        }
+        const data = await res.json();
+        setProducts(data as Product[]);
+        setFetchError(false);
       } catch (e) {
-        console.error("Products fetch exception:", e);
+        console.error("Products fetch error:", e);
         if (retries > 0) {
           setTimeout(() => load(retries - 1), 2000);
           return;

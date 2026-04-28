@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,24 +19,19 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
+      const result = await signIn(email, password);
+      if (result.error) {
         setError("メールアドレスまたはパスワードが正しくありません。");
-        setLoading(false);
-        return;
-      }
-      if (data?.session) {
-        // セッション確立済み。ハードリロードで遷移
-        window.location.replace("/products");
       } else {
-        setError("ログインに成功しましたが、セッションが取得できませんでした。ページを再読み込みしてください。");
-        setLoading(false);
+        // ソフトナビゲーション（リロードしない→セッション維持）
+        router.push("/products");
+        return;
       }
     } catch (err) {
       console.error("Sign in error:", err);
       setError("ログイン中にエラーが発生しました。再度お試しください。");
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   // BUG: #5 — パスワードが空欄でもログインボタンが活性化している
